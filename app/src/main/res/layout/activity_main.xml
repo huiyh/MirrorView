@@ -4,18 +4,16 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:drawableTop="@mipmap/ic_launcher_round"
-        android:text="Hello World!"/>
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:hint="I'm a button"
         android:text="I'm a button"/>
 
     <View
@@ -24,9 +22,22 @@
         android:layout_margin="10dp"
         android:background="@android:color/black"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="下边黑框内容是MirrorView"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:padding="1dp">
 
         <com.huiyh.mirrorview.MirrorView
             android:id="@+id/mirror"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="left"/>
+    </FrameLayout>
 </LinearLayout>

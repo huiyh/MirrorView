@@ -13,27 +13,33 @@ import android.view.ViewTreeObserver;
 /**
  * Created by huiyh on 2017/3/13.
  *
- * 如果需要与
+ * BUG: 宽高为wrap_content时,效果是match_parent
  */
 
 public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListener {
+    private int primaryWidth;
+    private int primaryHeight;
     private View mirroredView;
 
     public MirrorView(Context context) {
         super(context);
+        saveDefaultLayout();
     }
 
     public MirrorView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        saveDefaultLayout();
     }
 
     public MirrorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        saveDefaultLayout();
     }
 
     @TargetApi(21)
     public MirrorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        saveDefaultLayout();
     }
 
     public void setMirroredView(View view) {
@@ -42,8 +48,32 @@ public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListen
         if (mirroredView != null) {
             ViewTreeObserver treeObserver = mirroredView.getViewTreeObserver();
             treeObserver.addOnPreDrawListener(this);
+        }else {
+            resetLayout();
         }
+    }
 
+    private void saveDefaultLayout() {
+        LayoutParams layoutParams = getLayoutParams();
+        if (layoutParams != null){
+            primaryWidth = layoutParams.width;
+            primaryHeight = layoutParams.height;
+        }else {
+            primaryWidth = 0;
+            primaryHeight = 0;
+        }
+    }
+
+    private void resetLayout() {
+        LayoutParams layoutParams = getLayoutParams();
+        if (layoutParams != null){
+            layoutParams.width = primaryWidth;
+            layoutParams.height = primaryHeight;
+        }
+    }
+
+    public View getMirroredView() {
+        return mirroredView;
     }
 
     @Override
@@ -73,7 +103,6 @@ public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListen
         }
     }
 
-
     @Override
     public boolean onPreDraw() {
         updateLayout();
@@ -81,20 +110,4 @@ public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListen
         return true;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (mirroredView != null) {
-            // TODO
-            int width = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-            int height = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-            setMeasuredDimension(width, height);
-        } else {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        }
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-    }
 }
