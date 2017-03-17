@@ -7,10 +7,13 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 
 /**
  * Created by huiyh on 2017/3/13.
+ *
+ * 如果需要与
  */
 
 public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListener {
@@ -33,34 +36,61 @@ public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListen
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public void setMirroredView(View view){
+    public void setMirroredView(View view) {
         mirroredView = view;
-        ViewTreeObserver treeObserver = mirroredView.getViewTreeObserver();
-        treeObserver.addOnPreDrawListener(this);
+        updateLayout();
+        if (mirroredView != null) {
+            ViewTreeObserver treeObserver = mirroredView.getViewTreeObserver();
+            treeObserver.addOnPreDrawListener(this);
+        }
+
     }
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        mirroredView.draw(canvas);
+        if (mirroredView != null) {
+            mirroredView.draw(canvas);
+        }
+    }
+
+    private void updateLayout() {
+        LayoutParams layoutParams = getLayoutParams();
+        int width = mirroredView.getWidth();
+        int height = mirroredView.getHeight();
+        layoutParams.width = width;
+        layoutParams.height = height;
+        setLayoutParams(layoutParams);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mirroredView.onTouchEvent(event);
-//        return super.onTouchEvent(event);
+
+        if (mirroredView != null) {
+            return mirroredView.onTouchEvent(event);
+        } else {
+            return super.onTouchEvent(event);
+        }
     }
 
 
     @Override
     public boolean onPreDraw() {
+        updateLayout();
         invalidate();
-        return false;
+        return true;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mirroredView != null) {
+            // TODO
+            int width = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+            int height = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+            setMeasuredDimension(width, height);
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
     }
 
     @Override
