@@ -5,7 +5,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.MotionEvent.PointerCoords;
+import android.view.MotionEvent.PointerProperties;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
@@ -108,6 +111,48 @@ public class MirrorView extends View implements ViewTreeObserver.OnPreDrawListen
         updateLayout();
         invalidate();
         return true;
+    }
+
+    private MotionEvent obtainMirrorEvent(View mirroredView, MotionEvent event) {
+        int[] curLoc = new int[2];
+        getLocationOnScreen(curLoc);
+        int[] mirroredLoc = new int[2];
+        mirroredView.getLocationOnScreen(mirroredLoc);
+
+        int diffX = mirroredLoc[0] - curLoc[0];
+        int diffY = mirroredLoc[1] - curLoc[1];
+
+        MotionEvent mirroredEvent = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(),
+                event.getPointerCount(), readPointerProperties(event), readPointerCoords(event, diffX, diffY),
+                event.getMetaState(), event.getButtonState(), event.getXPrecision(), event.getYPrecision(),
+                event.getDeviceId(), event.getEdgeFlags(), event.getSource(), event.getFlags());
+        Log.i("MirrorView", event.toString());
+        Log.i("MirrorView", mirroredEvent.toString());
+        return mirroredEvent;
+    }
+
+    PointerProperties[] readPointerProperties(MotionEvent event){
+        int count = event.getPointerCount();
+        PointerProperties[] array = new PointerProperties[count];
+        for (int i = 0; i < count; i++){
+            PointerProperties propertie = new PointerProperties();
+            event.getPointerProperties(i,propertie);
+            array[i] = propertie;
+        }
+        return array;
+    }
+
+    PointerCoords[] readPointerCoords(MotionEvent event, int diffX, int diffY){
+        int count = event.getPointerCount();
+        PointerCoords[] array = new PointerCoords[count];
+        for (int i = 0; i < count; i++){
+            PointerCoords coords = new PointerCoords();
+            event.getPointerCoords(i,coords);
+            coords.x = coords.x + diffX;
+            coords.y = coords.y + diffY;
+            array[i] = coords;
+        }
+        return array;
     }
 
 }
